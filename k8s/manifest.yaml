@@ -41,3 +41,19 @@ metadata: { name: bundles-app, namespace: skirmshop }
 spec:
   selector: { app: bundles-app }
   ports: [{ name: http, port: 80, targetPort: 3460 }]
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: bundles-app-public
+  namespace: skirmshop
+spec:
+  entryPoints: [websecure]
+  ingressClassName: traefik-edge
+  routes:
+    - match: Host(`bundles.e-dani.com`)
+      kind: Rule
+      services:
+        - name: bundles-app
+          port: 80
+  tls: {}
