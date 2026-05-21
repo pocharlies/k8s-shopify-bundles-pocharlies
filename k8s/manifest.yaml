@@ -1,0 +1,66 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: skirmshop
+  labels:
+    cnpg-backup: "true"   # triggers ClusterExternalSecret minio-backup-creds
+---
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bundles-app
+  namespace: skirmshop
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: bundles-app } }
+  template:
+    metadata: { labels: { app: bundles-app } }
+    spec:
+      enableServiceLinks: false
+      # Sauvage taint needed? bundles-app was running on sauvage.
+      # Migrate to LAN k3s (amd64) if no sauvage-specific dependency.
+      nodeSelector: { topology: lan, kubernetes.io/arch: amd64 }
+      containers:
+        - name: bundles-app
+          image: harbor.e-dani.com/homelab/shopify-bundle-app:latest
+          ports: [{ name: http, containerPort: 3460 }]
+          env:
+            - { name: PORT, value: "3460" }
+            - { name: DATABASE_URL, value: "postgresql://$(DB_USER):$(DB_PASSWORD)@shared-postgres-rw.skirmshop.svc.cluster.local:5432/skirmshop" }
+            - { name: SHOPIFY_APP_URL, value: "https://skirmshop.e-dani.com/bundles" }
+            - { name: NODE_ENV, value: "production" }
+          envFrom: [{ secretRef: { name: labels-secrets } }]
+          resources:
+            requests: { cpu: 50m, memory: 128Mi }
+            limits:   { memory: 512Mi }
+          readinessProbe:
+            tcpSocket: { port: 3460 }
+            initialDelaySeconds: 20
+---
+---
+apiVersion: v1
+kind: Service
+metadata: { name: bundles-app, namespace: skirmshop }
+spec:
+  selector: { app: bundles-app }
+  ports: [{ name: http, port: 80, targetPort: 3460 }]
+---
+---
+# Public IngressRoute (served by Traefik EDGE)
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: bundles-app-public
+  namespace: skirmshop
+spec:
+  entryPoints: [websecure]
+  ingressClassName: traefik-edge
+  routes:
+    - match: Host(`bundles.e-dani.com`)
+      kind: Rule
+      services:
+        - name: bundles-app
+          port: 80
+  tls: {}
