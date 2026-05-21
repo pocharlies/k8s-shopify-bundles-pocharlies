@@ -21,6 +21,10 @@ spec:
             - { name: PORT, value: "3460" }
             - { name: DATABASE_URL, value: "postgresql://$(DB_USER):$(DB_PASSWORD)@shared-postgres-rw.skirmshop.svc.cluster.local:5432/skirmshop" }
             - { name: SHOPIFY_APP_URL, value: "https://skirmshop.e-dani.com/bundles" }
+            - { name: SHOPIFY_ALLOWED_SHOPS, value: "skirmshop-spain.myshopify.com" }
+            - { name: SHOPIFY_APP_PROXY_MAX_AGE_SECONDS, value: "300" }
+            - { name: STANDALONE_CONFIGURATOR_ENABLED, value: "false" }
+            - { name: SCOPES, value: "read_products,write_products,read_inventory,read_orders,write_app_proxy" }
             - { name: NODE_ENV, value: "production" }
           envFrom: [{ secretRef: { name: labels-secrets } }]
           resources:
@@ -37,21 +41,3 @@ metadata: { name: bundles-app, namespace: skirmshop }
 spec:
   selector: { app: bundles-app }
   ports: [{ name: http, port: 80, targetPort: 3460 }]
----
----
-# Public IngressRoute (served by Traefik EDGE)
-apiVersion: traefik.io/v1alpha1
-kind: IngressRoute
-metadata:
-  name: bundles-app-public
-  namespace: skirmshop
-spec:
-  entryPoints: [websecure]
-  ingressClassName: traefik-edge
-  routes:
-    - match: Host(`bundles.e-dani.com`)
-      kind: Rule
-      services:
-        - name: bundles-app
-          port: 80
-  tls: {}
