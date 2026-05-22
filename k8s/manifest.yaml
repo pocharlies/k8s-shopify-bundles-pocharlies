@@ -16,6 +16,7 @@ spec:
       containers:
         - name: bundles-app
           image: harbor.e-dani.com/homelab/shopify-bundle-app@sha256:ff57063ed7edf3d1ffd83aedd5292222fae1f43e685913343b35d185a93a2321
+          imagePullPolicy: IfNotPresent
           ports: [{ name: http, containerPort: 3460 }]
           env:
             - { name: PORT, value: "3460" }
