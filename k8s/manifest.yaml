@@ -61,4 +61,5 @@ spec:
       services:
         - name: bundles-app
           port: 80
-  tls: {}
+  tls:
+    store: { name: default, namespace: traefik-edge }
