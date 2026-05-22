@@ -15,7 +15,7 @@ spec:
         - { key: role, operator: Equal, value: edge, effect: NoSchedule }
       containers:
         - name: bundles-app
-          image: harbor.e-dani.com/homelab/shopify-bundle-app@sha256:fd50b43dde4f52076707a487d273cfeadae3f75d3ef7fd9c48698c1d223eb6ca
+          image: harbor.e-dani.com/homelab/shopify-bundle-app@sha256:eb42404de30cd0568b58f1feed1c84af2f67ea645be1a0c728faf25f153ba24f
           ports: [{ name: http, containerPort: 3460 }]
           env:
             - { name: PORT, value: "3460" }
