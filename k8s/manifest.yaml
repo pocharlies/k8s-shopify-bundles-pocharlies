@@ -10,9 +10,9 @@ spec:
     metadata: { labels: { app: bundles-app } }
     spec:
       enableServiceLinks: false
-      # Sauvage taint needed? bundles-app was running on sauvage.
-      # Migrate to LAN k3s (amd64) if no sauvage-specific dependency.
-      nodeSelector: { topology: lan, kubernetes.io/arch: amd64 }
+      nodeSelector: { role: edge, kubernetes.io/arch: amd64 }
+      tolerations:
+        - { key: role, operator: Equal, value: edge, effect: NoSchedule }
       containers:
         - name: bundles-app
           image: harbor.e-dani.com/homelab/shopify-bundle-app@sha256:fd50b43dde4f52076707a487d273cfeadae3f75d3ef7fd9c48698c1d223eb6ca
