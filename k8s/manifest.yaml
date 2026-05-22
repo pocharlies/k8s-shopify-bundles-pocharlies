@@ -19,7 +19,7 @@ spec:
           ports: [{ name: http, containerPort: 3460 }]
           env:
             - { name: PORT, value: "3460" }
-            - { name: DATABASE_URL, value: "postgresql://$(DB_USER):$(DB_PASSWORD)@shared-postgres-rw.skirmshop.svc.cluster.local:5432/skirmshop" }
+            - { name: DATABASE_URL, value: "postgresql://$(DB_USER):$(DB_PASSWORD)@postgres-shared-rw.databases.svc.cluster.local:5432/skirmshop" }
             - { name: SHOPIFY_APP_URL, value: "https://skirmshop.e-dani.com/bundles" }
             - { name: SHOPIFY_ALLOWED_SHOPS, value: "skirmshop-spain.myshopify.com" }
             - { name: SHOPIFY_APP_PROXY_MAX_AGE_SECONDS, value: "300" }
