@@ -1,0 +1,31 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - git@github.com:pocharlies/k8s-shopify-framework-pocharlies.git//base?ref=deploy/prod
+
+namePrefix: bundles-
+
+labels:
+  - includeSelectors: true
+    pairs:
+      app.kubernetes.io/instance: bundles
+
+images:
+  - name: shopify-app
+    newName: harbor.e-dani.com/homelab/shopify-bundle-app
+    digest: sha256:ff57063ed7edf3d1ffd83aedd5292222fae1f43e685913343b35d185a93a2321
+
+patches:
+  - path: deployment-env.yaml
+    target: { kind: Deployment, name: app }
+  - target: { group: apps, version: v1, kind: Deployment, name: app }
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/ports/0/containerPort
+        value: 3460
+  - target: { group: traefik.io, version: v1alpha1, kind: IngressRoute, name: app }
+    patch: |-
+      - op: replace
+        path: /spec/routes/0/match
+        value: Host(`skirmshop.e-dani.com`) && PathPrefix(`/bundles`)
