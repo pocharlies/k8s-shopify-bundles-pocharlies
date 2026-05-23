@@ -17,8 +17,28 @@ images:
     digest: sha256:ff57063ed7edf3d1ffd83aedd5292222fae1f43e685913343b35d185a93a2321
 
 patches:
-  - path: deployment-env.yaml
-    target: { kind: Deployment, name: app }
+  # Inlined (not a separate file) so CI kubeconform doesn't treat it as a
+  # standalone, selector-less Deployment.
+  - target: { kind: Deployment, name: app }
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: app
+      spec:
+        template:
+          spec:
+            containers:
+              - name: app
+                env:
+                  - { name: PORT, value: "3460" }
+                  - { name: SHOPIFY_APP_URL, value: "https://skirmshop.e-dani.com/bundles" }
+                  - { name: SCOPES, value: "read_products,write_products,read_inventory,read_orders,write_app_proxy" }
+                  - { name: SHOPIFY_ALLOWED_SHOPS, value: "skirmshop-spain.myshopify.com" }
+                  - { name: SHOPIFY_APP_PROXY_MAX_AGE_SECONDS, value: "300" }
+                  - { name: STANDALONE_CONFIGURATOR_ENABLED, value: "false" }
+                envFrom:
+                  - secretRef: { name: bundles-secrets }
   - target: { group: apps, version: v1, kind: Deployment, name: app }
     patch: |-
       - op: replace
