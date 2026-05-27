@@ -14,7 +14,7 @@ labels:
 images:
   - name: shopify-app
     newName: harbor.e-dani.com/homelab/shopify-bundle-app
-    digest: sha256:ff57063ed7edf3d1ffd83aedd5292222fae1f43e685913343b35d185a93a2321
+    digest: sha256:4115b60bce2dcef6db92c8c8f584bcdbe8857dc3d1595cbc5428a71b560217fc
 
 patches:
   # Inlined (not a separate file) so CI kubeconform doesn't treat it as a
@@ -33,7 +33,7 @@ patches:
                 env:
                   - { name: PORT, value: "3460" }
                   - { name: SHOPIFY_APP_URL, value: "https://skirmshop.e-dani.com/bundles" }
-                  - { name: SCOPES, value: "read_products,write_products,read_inventory,read_orders,write_app_proxy" }
+                  - { name: SCOPES, value: "read_products,write_products,read_inventory,read_orders,write_app_proxy,read_cart_transforms,write_cart_transforms,read_discounts,write_discounts" }
                   - { name: SHOPIFY_ALLOWED_SHOPS, value: "skirmshop-spain.myshopify.com" }
                   - { name: SHOPIFY_APP_PROXY_MAX_AGE_SECONDS, value: "300" }
                   - { name: STANDALONE_CONFIGURATOR_ENABLED, value: "false" }
